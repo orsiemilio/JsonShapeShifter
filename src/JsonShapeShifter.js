@@ -1,5 +1,3 @@
-// JsonShapeShifter.js
-
 /**
  * A class for transforming JSON objects based on specified templates and custom processing functions.
  */
@@ -14,7 +12,11 @@ class JsonShapeShifter {
    */
   constructor(options = {}) {
     // Validate the structure of the options object
-    if (typeof options !== "object" || options === null || Array.isArray(options)) {
+    if (
+      typeof options !== "object" ||
+      options === null ||
+      Array.isArray(options)
+    ) {
       throw new TypeError("Invalid options parameter.");
     }
 
@@ -35,7 +37,11 @@ class JsonShapeShifter {
     }
 
     // Validate pathProcessors object
-    if (typeof pathProcessors !== "object" || pathProcessors === null || Array.isArray(pathProcessors)) {
+    if (
+      typeof pathProcessors !== "object" ||
+      pathProcessors === null ||
+      Array.isArray(pathProcessors)
+    ) {
       throw new TypeError("Invalid options.pathProcessors parameter.");
     }
     Object.entries(pathProcessors).forEach(([path, processor]) => {
@@ -67,7 +73,7 @@ class JsonShapeShifter {
     template = template || inJs;
 
     if (typeof template === "function") {
-      return template(inJs)
+      return template(inJs);
     }
 
     // If custom processor found for current path, then cut the circuit
