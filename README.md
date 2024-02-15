@@ -19,7 +19,7 @@ A while back, I faced issues with the structure of JSON data from MongoDB. To so
 ### Basic Transformation
 
 ```javascript
-const JsonShapeShifter = require('path/to/json-shape-shifter');
+const JsonShapeShifter = require('json-shape-shifter');
 
 const shaper = new JsonShapeShifter();
 const input = { name: "John", age: 30, favoriteHero: "MacGiver" };
