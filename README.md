@@ -1,6 +1,8 @@
 
 # JsonShapeShifter
 
+[![codecov](https://codecov.io/gh/orsiemilio/JsonShapeShifter/graph/badge.svg?token=SMTK5VI1E2)](https://codecov.io/gh/orsiemilio/JsonShapeShifter)
+
 JsonShapeShifter is a handy tool made to change JSON objects into different shapes using specific rules and functions you set. It's super useful for a bunch of tasks, like fixing up data to send over the web, organizing information, or even getting data ready to be turned into XML for special web services, where keeping things in the right order is super important.
 
 A while back, I faced issues with the structure of JSON data from MongoDB. To solve this, especially since I had to work with SOAP-based services where XML demands precise ordering of values, I developed a solution similar to this.

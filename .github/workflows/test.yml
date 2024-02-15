@@ -1,0 +1,18 @@
+# .github/workflows/test.yml
+name: Test
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - name: Install
+        run: npm install
+      - name: Test and Coverage
+        run: npm run test:coverage
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        env:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: orsiemilio/JsonShapeShifter
