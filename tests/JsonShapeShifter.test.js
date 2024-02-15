@@ -252,15 +252,15 @@ describe("JsonShapeShifter", () => {
             consumption: {
               // This shoulnd't be sorted since there's a custom path processor
               by: "hour",
-              kw: 1000
+              kw: 1000,
             },
             name: "freedge",
           },
-        ]
+        ],
       },
       pathProcessors: {
         "hobbies[*]": ({ name }) => ({ name: name.toUpperCase() }),
-        "appliances[*].consumption": ({ kw, by }) => ({ kw: kw+100, by }),
+        "appliances[*].consumption": ({ kw, by }) => ({ kw: kw + 100, by }),
       },
     };
 
@@ -268,22 +268,22 @@ describe("JsonShapeShifter", () => {
 
     const input = {
       appliances: [
-          {
-            name: "freedge",
-            consumption: {
-              // sorry the electricity nonces :)
-              kw: 1000,
-              by: "hour"
-            }
+        {
+          name: "freedge",
+          consumption: {
+            // sorry the electricity nonces :)
+            kw: 1000,
+            by: "hour",
           },
-          {
-            name: "thermostat",
-            consumption: {
-              kw: 1500,
-              by: "hour"
-            }
+        },
+        {
+          name: "thermostat",
+          consumption: {
+            kw: 1500,
+            by: "hour",
           },
-        ],
+        },
+      ],
       hobbies: [
         {
           name: "sing",
@@ -316,14 +316,14 @@ describe("JsonShapeShifter", () => {
           {
             consumption: {
               kw: 1100,
-              by: "hour"
+              by: "hour",
             },
             name: "freedge",
           },
           {
             consumption: {
               kw: 1600,
-              by: "hour"
+              by: "hour",
             },
             name: "thermostat",
           },
@@ -332,4 +332,95 @@ describe("JsonShapeShifter", () => {
     );
   });
 
+  test("add processors within the template", () => {
+    const shaper = new JsonShapeShifter();
+    const input = { name: "John", age: 34 };
+    const template = { name: undefined, age: (age) => age + 3 };
+
+    expect(() => shaper.formatJsByTemplate(input, template)).not.toThrow();
+    const output = shaper.formatJsByTemplate(input, template);
+    expect(JSON.stringify(output)).toEqual(
+      JSON.stringify({ name: "John", age: 37 })
+    );
+  });
+});
+
+describe("JsonShapeShifter Constructor Error Handling", () => {
+  const invalidOptions = [null, 42, "string", false, []];
+  test.each(invalidOptions)(
+    "throws error if options is not an object. Checking '%s'",
+    (invalidInput) => {
+      expect(() => {
+        new JsonShapeShifter(invalidInput);
+      }).toThrow(TypeError);
+      expect(() => {
+        new JsonShapeShifter(invalidInput);
+      }).toThrow("Invalid options parameter.");
+    }
+  );
+
+  test("throws error if leafProcessor is not a function", () => {
+    expect(() => {
+      new JsonShapeShifter({ leafProcessor: "notAFunction" });
+    }).toThrow(TypeError);
+    expect(() => {
+      new JsonShapeShifter({ leafProcessor: "notAFunction" });
+    }).toThrow("options.leafProcessor must be a function.");
+  });
+
+  test("throws error if keysProcessor is not a function", () => {
+    expect(() => {
+      new JsonShapeShifter({ keysProcessor: 123 });
+    }).toThrow(TypeError);
+    expect(() => {
+      new JsonShapeShifter({ keysProcessor: 123 });
+    }).toThrow("options.keysProcessor must be a function.");
+  });
+
+  const invalidProcessors = [null, 42, "string", false, []];
+  test.each(invalidProcessors)(
+    "throws error if pathProcessors is not an object. Checking '%s'",
+    (invalidProcessor) => {
+      expect(() => {
+        new JsonShapeShifter({ pathProcessors: invalidProcessor });
+      }).toThrow(TypeError);
+      expect(() => {
+        new JsonShapeShifter({ pathProcessors: invalidProcessor });
+      }).toThrow("Invalid options.pathProcessors parameter.");
+    }
+  );
+
+  test("throws error if any pathProcessor is not a function", () => {
+    expect(() => {
+      new JsonShapeShifter({
+        pathProcessors: { "/some/path": "notAFunction" },
+      });
+    }).toThrow(TypeError);
+    expect(() => {
+      new JsonShapeShifter({
+        pathProcessors: { "/some/path": "notAFunction" },
+      });
+    }).toThrow("options.pathProcessors[/some/path] must be a function.");
+  });
+});
+
+describe("JsonShapeShifter Bad data format Error Handling", () => {
+  test("gracefully handles unexpected data types", () => {
+    const shaper = new JsonShapeShifter();
+    const input = { name: "John", age: "thirty" }; // 'age' intentionally incorrect
+    const template = { name: undefined, age: (age) => parseInt(age, 10) };
+
+    expect(() => shaper.formatJsByTemplate(input, template)).not.toThrow();
+    const output = shaper.formatJsByTemplate(input, template);
+    expect(output.age).toBeNaN(); // Example expectation, adjust based on actual handling
+  });
+
+  test("template with more keys than input", () => {
+    const shaper = new JsonShapeShifter();
+    const input = { name: "John" };
+    const template = { name: undefined, age: undefined };
+
+    const output = shaper.formatJsByTemplate(input, template);
+    expect(JSON.stringify(output)).toEqual(JSON.stringify({ name: "John" }));
+  });
 });

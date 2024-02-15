@@ -8,3 +8,4 @@ TODO:
 - Plugin logic for easy extend
 - add custom path processing (not just for leafs)
 - add path keys custom processors
+- update template logic to receive custom path processors in the template itself, insead of receiving a separated customPath option
