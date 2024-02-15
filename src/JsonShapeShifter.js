@@ -4,7 +4,7 @@ class JsonShapeShifter {
     this.options = {
       leafProcessor: (value) => value,
       keysProcessor: (key, path) => key,
-      leafProcessorsByPath: {},
+      pathProcessors: {},
       template: null,
       ...options,
     };
@@ -17,20 +17,30 @@ class JsonShapeShifter {
         );
       }
     }
+
+    for (const path in this.options.pathProcessors) {
+      if (typeof this.options.pathProcessors[path] !== "function") {
+        throw new Error(
+          `BAD-CONFIG: 'options.pathProcessors[${path}]' must be a function.`
+        );
+      }
+    }
   }
 
   formatJsByTemplate(inJs, template = this.options.template, currentPath = "") {
-    // Use the class-level template if none is provided
-    if (template === undefined || template === null) {
-      template = inJs; // Fallback to using inJs as the template
-    }
+    // Fallback to using inJs as the template
+    template = template || inJs;
+
+    // If custom processor found for current path, then cut the circuit
+    const customProcessor = this.getCustomPathsProcessor(currentPath);
+    if (customProcessor) return customProcessor(inJs, template, currentPath);
 
     if (typeof inJs === "object" && inJs !== null) {
       if (!Array.isArray(template)) {
         const jsRes = {};
         for (const key in template) {
           const newPath = currentPath === "" ? key : `${currentPath}.${key}`;
-          const processedKey = this.options.keysProcessor(key, newPath);
+          const processedKey = this.keysProcessor(key, newPath);
           if (inJs.hasOwnProperty(key) && template.hasOwnProperty(key)) {
             // Ensure template has the key
             jsRes[processedKey] = this.formatJsByTemplate(
@@ -52,20 +62,27 @@ class JsonShapeShifter {
         return jsRes;
       }
     } else {
-      return this.processLeaf(inJs, currentPath);
+      return this.processLeaf(inJs);
     }
   }
 
-  processLeaf(value, path) {
-    const leafP = this.options.leafProcessorsByPath;
+  keysProcessor(key, path) {
+    return this.options.keysProcessor(key, path);
+  }
+
+  processLeaf(value) {
+    return this.options.leafProcessor(value);
+  }
+
+  /**
+   * You need to make shure that the path is correct (expect the desired type)
+   * @returns
+   */
+  getCustomPathsProcessor(path) {
+    const leafP = this.options.pathProcessors;
     // if path has arrays, we can use * to process all entrance
     const scapedPath = path.replace(/\[[0-9]+\]/, "[*]");
-    const leafProcessorsByPath = leafP[path] || leafP[scapedPath];
-
-    if (leafProcessorsByPath && typeof leafProcessorsByPath === "function") {
-      return leafProcessorsByPath(value);
-    }
-    return this.options.leafProcessor(value);
+    return leafP[path] || leafP[scapedPath];
   }
 }
 

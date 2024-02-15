@@ -34,7 +34,7 @@ describe("JsonShapeShifter", () => {
 
   test("handles path-specific configuration", () => {
     const shaper = new JsonShapeShifter({
-      leafProcessorsByPath: {
+      pathProcessors: {
         "details.age": (value) => (value > 18 ? "adult" : "minor"),
       },
     });
@@ -150,7 +150,7 @@ describe("JsonShapeShifter", () => {
           },
         ],
       },
-      leafProcessorsByPath: {
+      pathProcessors: {
         "hobbies[1].name": (value) => value.toUpperCase(),
       },
     };
@@ -199,7 +199,7 @@ describe("JsonShapeShifter", () => {
           },
         ],
       },
-      leafProcessorsByPath: {
+      pathProcessors: {
         "hobbies[*].name": (value) => value.toUpperCase(),
       },
     };
@@ -238,4 +238,98 @@ describe("JsonShapeShifter", () => {
       })
     );
   });
+
+  test("custom path processor", () => {
+    const config = {
+      template: {
+        hobbies: [
+          {
+            name: undefined,
+          },
+        ],
+        appliances: [
+          {
+            consumption: {
+              // This shoulnd't be sorted since there's a custom path processor
+              by: "hour",
+              kw: 1000
+            },
+            name: "freedge",
+          },
+        ]
+      },
+      pathProcessors: {
+        "hobbies[*]": ({ name }) => ({ name: name.toUpperCase() }),
+        "appliances[*].consumption": ({ kw, by }) => ({ kw: kw+100, by }),
+      },
+    };
+
+    const shaper = new JsonShapeShifter(config);
+
+    const input = {
+      appliances: [
+          {
+            name: "freedge",
+            consumption: {
+              // sorry the electricity nonces :)
+              kw: 1000,
+              by: "hour"
+            }
+          },
+          {
+            name: "thermostat",
+            consumption: {
+              kw: 1500,
+              by: "hour"
+            }
+          },
+        ],
+      hobbies: [
+        {
+          name: "sing",
+        },
+        {
+          name: "percussion",
+        },
+        {
+          name: "drowning life watching sotial networks videos",
+        },
+      ],
+    };
+
+    const output = shaper.formatJsByTemplate(input);
+
+    expect(JSON.stringify(output)).toEqual(
+      JSON.stringify({
+        hobbies: [
+          {
+            name: "SING",
+          },
+          {
+            name: "PERCUSSION",
+          },
+          {
+            name: "DROWNING LIFE WATCHING SOTIAL NETWORKS VIDEOS",
+          },
+        ],
+        appliances: [
+          {
+            consumption: {
+              kw: 1100,
+              by: "hour"
+            },
+            name: "freedge",
+          },
+          {
+            consumption: {
+              kw: 1600,
+              by: "hour"
+            },
+            name: "thermostat",
+          },
+        ],
+      })
+    );
+  });
+
 });
