@@ -1,8 +1,36 @@
 {
+  "name": "json-shape-shifter",
+  "version": "1.0.0",
+  "author": "Emilio Orsi <orsiemilio@gmail.com>",
+  "description": "A library for transforming JSON structures, with features for custom processing and ensuring order.",
+  "main": "src/JsonShapeShifter.js",
   "scripts": {
     "test": "jest",
     "test:coverage": "jest --coverage"
-  },  
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orsiemilio/JsonShapeShifter.git"
+  },
+  "keywords": [
+    "json",
+    "sorting",
+    "formatter",
+    "json-schema",
+    "shape",
+    "soap",
+    "sort",
+    "shapeshifter",
+    "shapeshift",
+    "json-processing",
+    "json-sorting",
+    "json-transform",
+    "json-processor"
+  ],
+  "license": "MIT",
+  "files": [
+    "src/JsonShapeShifter.js"
+  ],
   "devDependencies": {
     "jest": "^29.7.0"
   }
