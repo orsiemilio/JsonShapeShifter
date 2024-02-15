@@ -1,7 +1,9 @@
 
 # JsonShapeShifter
 
-JsonShapeShifter is a versatile JavaScript library designed to transform JSON objects based on specified templates and custom processing functions. It facilitates the dynamic reshaping of JSON structures, tailored for various applications including API responses, data normalization, and particularly for converting JSON to XML where strict element order is required. This capability is especially valuable in contexts like SOAP-based services, where the stringent order of XML elements is critical. Given that MongoDB/Mongoose may retrieve objects keys in an unpredictable order (at least this happened to me), JsonShapeShifter ensures the structure is standardized, making it seamlessly compatible for XML transformation and adhering to SOAP's strict requirements.
+JsonShapeShifter is a handy tool made to change JSON objects into different shapes using specific rules and functions you set. It's super useful for a bunch of tasks, like fixing up data to send over the web, organizing information, or even getting data ready to be turned into XML for special web services, where keeping things in the right order is super important.
+
+A while back, I faced issues with the structure of JSON data from MongoDB. To solve this, especially since I had to work with SOAP-based services where XML demands precise ordering of values, I developed a solution similar to this.
 
 ## Features
 
