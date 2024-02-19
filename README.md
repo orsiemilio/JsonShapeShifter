@@ -39,8 +39,10 @@ const shaper = new JsonShapeShifter({
 const input = { name: "John" };
 const output = shaper.formatJsByTemplate(input);
 console.log(output); // Output: { NAME: "JOHN" }
+```
 
 ## Path-Specific Processing
+```javascript
 const shaper = new JsonShapeShifter({
   pathProcessors: {
     "details.age": (value) => value > 18 ? "adult" : "minor",
